@@ -4,8 +4,12 @@ from app import app, db
 from app.models import Message
 
 
-@app.route('/add')
-def hello_world_add():
+@app.route('/', methods=['POST'])
+def challenge():
+    if request.is_json:
+        return request.get_json()['challenge']
+
+def add_message():
     message = Message(user='a', message='b')
     db.session.add(message)
     db.session.commit()
@@ -14,6 +18,7 @@ def hello_world_add():
 
 @app.route('/read')
 def hello_world_read():
-    instance = db.session.query(Message).first()
+    instance = db.session.query(Message).last()
     return instance.user
+
 
