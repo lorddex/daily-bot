@@ -17,7 +17,7 @@ def add_message():
 
 @app.route('/read')
 def hello_world_read():
-    instance = db.session.query(Message).last()
+    instance = db.session.query(Message).order_by(Message.id.desc()).first()
     return '{} {}'.format(instance.user, instance.message)
 
 
