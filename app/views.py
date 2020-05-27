@@ -5,20 +5,19 @@ from app.models import Message
 
 
 @app.route('/', methods=['POST'])
-def challenge():
-    if request.is_json:
-        return request.get_json()['challenge']
-
 def add_message():
-    message = Message(user='a', message='b')
+    if not request.is_json:
+        return
+    body = request.get_json()
+    message = Message(user=body['user'], message=body['message'])
     db.session.add(message)
     db.session.commit()
-    return 'Hello, world!'
+    return ''
 
 
 @app.route('/read')
 def hello_world_read():
     instance = db.session.query(Message).last()
-    return instance.user
+    return '{} {}'.format(instance.user, instance.message)
 
 
