@@ -18,7 +18,7 @@ HANDLERS = {
 
 def unwrap_event():
     body = request.get_json()
-    app.logger.debug(json.dumps(body))
+    app.logger.warning(json.dumps(body))
     return body
 
 
