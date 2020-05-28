@@ -1,3 +1,4 @@
+import json
 from flask import request, Response
 
 from app import app, db
@@ -22,6 +23,7 @@ def unwrap_event():
 
 @app.route('/', methods=['POST'])
 def add_message():
+    app.logger.debug(json.dump(request))
     if not request.is_json:
         return Response(status=204)
 
