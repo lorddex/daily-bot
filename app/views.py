@@ -27,7 +27,7 @@ def add_message():
 
     message = unwrap_event()
 
-    if HANDLERS[message['type']]:
+    if 'type' in message and HANDLERS[message['type']]:
         HANDLERS[message['type']](message)
 
     return Response(status=204)
