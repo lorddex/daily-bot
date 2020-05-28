@@ -11,8 +11,15 @@ def handle_app_mention(message):
     db.session.commit()
 
 
+def handle_event_callback(message):
+    event = message['event']
+    message = Message(user=event['user'], message=event['message'])
+    db.session.add(message)
+    db.session.commit()
+
 HANDLERS = {
     'app_mention': handle_app_mention,
+    'event_callback': handle_event_callback,
 }
 
 
