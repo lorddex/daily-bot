@@ -23,7 +23,7 @@ def unwrap_event():
 
 @app.route('/', methods=['POST'])
 def add_message():
-    app.logger.debug(json.dump(request))
+    app.logger.debug(json.dumps(request))
     if not request.is_json:
         return Response(status=204)
 
