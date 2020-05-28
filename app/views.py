@@ -4,14 +4,32 @@ from app import app, db
 from app.models import Message
 
 
+def handle_app_mention(message):
+    message = Message(user=message['user'], message=message['message'])
+    db.session.add(message)
+    db.session.commit()
+
+
+HANDLERS = {
+    'app_mention': handle_app_mention,
+}
+
+
+def unwrap_event():
+    body = request.get_json()
+    return body
+
+
 @app.route('/', methods=['POST'])
 def add_message():
     if not request.is_json:
         return Response(status=204)
-    body = request.get_json()
-    message = Message(user=body['user'], message=body['message'])
-    db.session.add(message)
-    db.session.commit()
+
+    message = unwrap_event()
+
+    if HANDLERS[message['type']]:
+        HANDLERS[message['type']](message)
+
     return Response(status=204)
 
 
