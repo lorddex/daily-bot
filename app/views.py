@@ -18,12 +18,12 @@ HANDLERS = {
 
 def unwrap_event():
     body = request.get_json()
+    app.logger.debug(json.dumps(body))
     return body
 
 
 @app.route('/', methods=['POST'])
 def add_message():
-    app.logger.debug(json.dumps(request))
     if not request.is_json:
         return Response(status=204)
 
