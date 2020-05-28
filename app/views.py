@@ -13,7 +13,7 @@ def handle_app_mention(message):
 
 def handle_event_callback(message):
     event = message['event']
-    message = Message(user=event['user'], message=event['message'])
+    message = Message(user=event['user'], message=event['text'])
     db.session.add(message)
     db.session.commit()
 
