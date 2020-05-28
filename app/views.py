@@ -11,15 +11,14 @@ def handle_app_mention(message):
     db.session.commit()
 
 
-def handle_event_callback(message):
-    event = message['event']
+def handle_message(event):
     message = Message(user=event['user'], message=event['text'])
     db.session.add(message)
     db.session.commit()
 
 HANDLERS = {
     'app_mention': handle_app_mention,
-    'event_callback': handle_event_callback,
+    'message': handle_message,
 }
 
 
@@ -35,9 +34,9 @@ def add_message():
         return Response(status=204)
 
     message = unwrap_event()
-
-    if 'type' in message and HANDLERS[message['type']]:
-        HANDLERS[message['type']](message)
+    event = message['event']
+    if HANDLERS[event['type']]:
+        HANDLERS[event['type']](event)
 
     return Response(status=204)
 
