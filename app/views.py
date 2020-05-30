@@ -10,7 +10,7 @@ from app import app, db
 from app.models import Message
 
 
-client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
+client = WebClient(token=os.environ.get('SLACK_OAUTH_TOKEN', ''))
 
 
 def handle_app_mention(message):
