@@ -67,10 +67,14 @@ def message_received():
 
     event = unwrap_event()
     handler, event = get_handler(event)
+    response = None
+    status = 204
     if handler:
-        handler(event)
+        response, status = handler(event)
 
-    return Response(status=204)
+    if response:
+        return Response(response, status=status)
+    return Response(status=status)
 
 
 @app.route('/read')
