@@ -17,11 +17,15 @@ client = WebClient(token=SLACK_OAUTH_TOKEN)
 
 
 def get_text(event):
-    rich_texts_elements = [
-        b['elements'] for b in event['blocks'] if b['type'] == 'rich_text_section'
+    rich_texts = [
+        b['elements'] for b in event['blocks'] if b['type'] == 'rich_text'
     ]
-    if rich_texts_elements:
-        return next([e['text'] for e in rich_texts_elements if e['type'] == 'text'], default=None)
+    if rich_texts:
+        rich_texts_sections = [
+            b['elements'] for b in rich_texts['elements'] if b['type'] == 'rich_text_section'
+        ]
+        if rich_texts_sections:
+            return next([e['text'] for e in rich_texts_sections if e['type'] == 'text'], default=None)
     return None
 
 
