@@ -20,13 +20,6 @@ def handle_url_verification(message):
     return Response(message['challenge'], status=200)
 
 
-def handle_app_mention(message):
-    message = Message(user=message['user'], message=message['message'])
-    db.session.add(message)
-    db.session.commit()
-    return Response(status=201)
-
-
 def handle_message(event):
     message = Message(user=event['user'], message=event['text'])
     db.session.add(message)
@@ -40,7 +33,7 @@ def handle_message(event):
 
 HANDLERS = {
     'event_callback': {
-        'app_mention': handle_app_mention,
+        'app_mention': handle_message,
         'message': handle_message,
     },
     'url_verification': handle_url_verification,
