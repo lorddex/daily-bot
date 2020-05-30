@@ -1,8 +1,16 @@
 import json
+import os
+
+from slack import WebClient
+from slack.errors import SlackApiError
+
 from flask import request, Response
 
 from app import app, db
 from app.models import Message
+
+
+client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
 
 
 def handle_app_mention(message):
