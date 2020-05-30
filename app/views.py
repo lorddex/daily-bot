@@ -24,6 +24,10 @@ def handle_message(event):
     db.session.add(message)
     db.session.commit()
 
+    client.chat_postMessage(
+        channel='#test1',
+        text="Hello world!")
+
 HANDLERS = {
     'app_mention': handle_app_mention,
     'message': handle_message,
@@ -37,7 +41,7 @@ def unwrap_event():
 
 
 @app.route('/', methods=['POST'])
-def add_message():
+def message_received():
     if not request.is_json:
         return Response(status=204)
 
