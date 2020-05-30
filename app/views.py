@@ -16,16 +16,20 @@ SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 client = WebClient(token=SLACK_OAUTH_TOKEN)
 
 
+def get_element(arr, type):
+    return [a for a in arr if a['type'] == type]
+
+
 def get_text(event):
-    rich_texts = [
-        b['elements'] for b in event['blocks'] if b['type'] == 'rich_text'
-    ]
-    if rich_texts:
-        rich_texts_sections = [
-            b['elements'] for b in rich_texts['elements'] if b['type'] == 'rich_text_section'
-        ]
-        if rich_texts_sections:
-            return next([e['text'] for e in rich_texts_sections if e['type'] == 'text'], default=None)
+    rt = get_element(event['blocks'], 'rich_text')
+    app.logger.warning(rt)
+    if rt:
+        rts = get_element(rt['elements'], 'rich_text_section')
+        app.logger.warning(rts)
+        if rts:
+            text = next(get_element(rts['elements'], 'text'), default=None)
+            app.logger.warning(text)
+            return text
     return None
 
 
