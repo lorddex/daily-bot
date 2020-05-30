@@ -16,12 +16,21 @@ SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 client = WebClient(token=SLACK_OAUTH_TOKEN)
 
 
+def get_text(event):
+    rich_texts_elements = [
+        b['elements'] for b in event['blocks'] if b['type'] == 'rich_text_section'
+    ]
+    if rich_texts_elements:
+        return next([e['text'] for e in rich_texts_elements if e['type'] == 'text'], default=None)
+    return None
+
+
 def handle_url_verification(message):
     return Response(message['challenge'], status=200)
 
 
 def handle_message(event):
-    message = Message(user=event['user'], message=event['text'])
+    message = Message(user=event['user'], message=get_text(event))
     db.session.add(message)
     db.session.commit()
     return Response(status=201)
