@@ -17,19 +17,21 @@ client = WebClient(token=SLACK_OAUTH_TOKEN)
 
 
 def handle_url_verification(message):
-    return message['challenge']
+    return Response(message['challenge'], status=200)
 
 
 def handle_app_mention(message):
     message = Message(user=message['user'], message=message['message'])
     db.session.add(message)
     db.session.commit()
+    return Response(status=201)
 
 
 def handle_message(event):
     message = Message(user=event['user'], message=event['text'])
     db.session.add(message)
     db.session.commit()
+    return Response(status=201)
 
 #    client.chat_postMessage(
 #        channel='#test1',
@@ -67,14 +69,11 @@ def message_received():
 
     event = unwrap_event()
     handler, event = get_handler(event)
-    response = None
-    status = 204
+    response = Response(status=204)
     if handler:
-        response, status = handler(event)
+        response = handler(event)
 
-    if response:
-        return Response(response, status=status)
-    return Response(status=status)
+    return response
 
 
 @app.route('/read')
