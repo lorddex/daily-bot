@@ -24,9 +24,10 @@ def handle_message(event):
     db.session.add(message)
     db.session.commit()
 
-    client.chat_postMessage(
-        channel='#test1',
-        text="Hello world!")
+#    client.chat_postMessage(
+#        channel='#test1',
+#        text="Hello world!")
+
 
 HANDLERS = {
     'app_mention': handle_app_mention,
