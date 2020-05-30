@@ -9,8 +9,15 @@ from flask import request, Response
 from app import app, db
 from app.models import Message
 
+SLACK_VER_TOKEN = os.environ.get('SLACK_VER_TOKEN', '')
+SLACK_OAUTH_TOKEN = os.environ.get('SLACK_OAUTH_TOKEN', '')
+SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 
-client = WebClient(token=os.environ.get('SLACK_OAUTH_TOKEN', ''))
+client = WebClient(token=SLACK_OAUTH_TOKEN)
+
+
+def handle_url_verification(message):
+    return message['challenge']
 
 
 def handle_app_mention(message):
@@ -30,9 +37,21 @@ def handle_message(event):
 
 
 HANDLERS = {
-    'app_mention': handle_app_mention,
-    'message': handle_message,
+    'event_callback': {
+        'app_mention': handle_app_mention,
+        'message': handle_message,
+    },
+    'url_verification': handle_url_verification,
 }
+
+
+def get_handler(event, handlers=HANDLERS):
+    if handlers[event['type']]:
+        handler = handlers[event['type']]
+        if isinstance(handler, dict):
+            return get_handler(event['event'], handlers=handler)
+        return handler, event
+    return None, None
 
 
 def unwrap_event():
@@ -46,10 +65,10 @@ def message_received():
     if not request.is_json:
         return Response(status=204)
 
-    message = unwrap_event()
-    event = message['event']
-    if HANDLERS[event['type']]:
-        HANDLERS[event['type']](event)
+    event = unwrap_event()
+    handler, event = get_handler(event)
+    if handler:
+        handler(event)
 
     return Response(status=204)
 
@@ -58,5 +77,3 @@ def message_received():
 def hello_world_read():
     instance = db.session.query(Message).order_by(Message.id.desc()).first()
     return '{} {}'.format(instance.user, instance.message)
-
-
