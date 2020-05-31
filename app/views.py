@@ -93,6 +93,8 @@ def daily_report():
     messages = db.session.query(Message).filter_by(
         user=request.form['user_id'],
     )
+    if messages.count() == 0:
+        return Response('No messages found', status=200)
     message_list = []
     for m in messages:
         message_elements = m.message['blocks'][0]['elements'][0]['elements']
