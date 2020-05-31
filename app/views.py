@@ -95,3 +95,29 @@ def message_received():
 def hello_world_read():
     instance = db.session.query(Message).order_by(Message.id.desc()).first()
     return '{} {}'.format(instance.user, instance.message)
+
+
+@app.route('/daily-report', methods=['POST'])
+def daily_report():
+    return Response(
+        {
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*It's 80 degrees right now.*"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Partly cloudy today and tomorrow"
+                    }
+                }
+            ]
+        }, status=200, headers={
+            'Content-type': 'application/json'
+        }
+    )
