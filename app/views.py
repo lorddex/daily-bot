@@ -100,7 +100,7 @@ def hello_world_read():
 @app.route('/daily-report', methods=['POST'])
 def daily_report():
     return Response(
-        {
+        json.dumps({
             "blocks": [
                 {
                     "type": "section",
@@ -117,7 +117,7 @@ def daily_report():
                     }
                 }
             ]
-        }, status=200, headers={
+        }), status=200, headers={
             'Content-type': 'application/json'
         }
     )
