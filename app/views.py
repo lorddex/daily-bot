@@ -99,26 +99,31 @@ def hello_world_read():
 
 @app.route('/daily-report', methods=['POST'])
 def daily_report():
+    app.logger.warning(request.form)
     messages = db.session.query(Message).filter_by(
         user='UHHPEMDDM',
     )
+    message_list = []
+    for m in messages:
+        message_list.append({
+            "type": "text",
+            "text": str(m)
+        })
     return Response(
         json.dumps({
             "blocks": [
                 {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "Found {} messages".format(messages.count())
-                    }
+                    "type": "rich_text_list",
+                    "elements": [
+                        {
+                            "type": "rich_text_section",
+                            "elements": message_list
+                        }
+                    ],
+                    "style": "bullet",
+                    "indent": 0
                 },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "Partly cloudy today and tomorrow"
-                    }
-                }
+
             ]
         }), status=200, headers={
             'Content-type': 'application/json'
