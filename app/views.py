@@ -128,7 +128,7 @@ def daily_report():
         }
     app.logger.warning(response_message)
     return Response(
-        json.dumps(), status=200, headers={
+        json.dumps(response_message), status=200, headers={
             'Content-type': 'application/json'
         }
     )
