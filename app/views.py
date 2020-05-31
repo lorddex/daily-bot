@@ -105,10 +105,18 @@ def daily_report():
     )
     message_list = []
     for m in messages:
+        message_elements = m.message['blocks'][0]['elements'][0]['elements']
+        message_elements.append({
+            "type": "text",
+            "text": "https://letsparty-workspace.slack.com/archives/{}/p{}".format(
+                m.message['channel'],
+                m.message['event_ts'].replace('.', '')
+            )
+        })
         message_list.append(
             {
                 "type": "rich_text_section",
-                "elements": m.message['blocks'][0]['elements'][0]['elements']
+                "elements": message_elements
             }
         )
     response_message = {
