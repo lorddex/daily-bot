@@ -108,12 +108,7 @@ def daily_report():
         message_list.append(
             {
                 "type": "rich_text_section",
-                "elements": [
-                    {
-                        "type": "text",
-                        "text": str(m)
-                    }
-                ]
+                "elements": m.message['blocks'][0]['elements']
             }
         )
     return Response(
