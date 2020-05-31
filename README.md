@@ -31,3 +31,9 @@ Configure two commands:
 * app_mention
 * app_mentions:read
 * message.im 
+
+### Environment Variables
+* DATABASE_URL:      Contains the DB URL that can be used to configure the DB
+* SLACK_OAUTH_TOKEN: OAuth token used to post messages/reactions
+* SLACK_SIGN_SECRET: Sign Secret
+* SLACK_VER_TOKEN:   Verification Token
