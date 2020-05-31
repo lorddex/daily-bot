@@ -107,8 +107,8 @@ def daily_report():
     for m in messages:
         message_elements = m.message['blocks'][0]['elements'][0]['elements']
         message_elements.append({
-            "type": "text",
-            "text": "https://letsparty-workspace.slack.com/archives/{}/p{}".format(
+            "type": "link",
+            "url": "https://letsparty-workspace.slack.com/archives/{}/p{}".format(
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
             )
