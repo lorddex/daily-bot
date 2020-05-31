@@ -113,17 +113,21 @@ def daily_report():
         json.dumps({
             "blocks": [
                 {
-                    "type": "rich_text_list",
+                    "type": "rich_text",
                     "elements": [
                         {
-                            "type": "rich_text_section",
-                            "elements": message_list
-                        }
-                    ],
-                    "style": "bullet",
-                    "indent": 0
-                },
-
+                            "type": "rich_text_list",
+                            "elements": [
+                                {
+                                    "type": "rich_text_section",
+                                    "elements": message_list
+                                }
+                            ],
+                            "style": "bullet",
+                            "indent": 0
+                        },
+                    ]
+                }
             ]
         }), status=200, headers={
             'Content-type': 'application/json'
