@@ -12,4 +12,3 @@ app_settings = os.getenv(
 app.config.from_object(app_settings)
 db = SQLAlchemy(app)
 from app import views
-

@@ -16,18 +16,18 @@ SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 client = WebClient(token=SLACK_OAUTH_TOKEN)
 
 
-def get_element(arr, sub, type):
-    return [a for a in arr[sub] if a['type'] == type]
+def get_elements(arr, type):
+    return [a for a in arr if a['type'] == type]
 
 
 def get_text(event):
-    rt = get_element(event, 'blocks', 'rich_text')
+    rt = get_elements(event['blocks'], 'rich_text')
     app.logger.warning(rt)
     if rt:
-        rts = get_element(rt, 'elements', 'rich_text_section')
+        rts = get_elements(next(rt)['elements'], 'rich_text_section')
         app.logger.warning(rts)
         if rts:
-            text = next(get_element(rts, 'elements', 'text'), default=None)
+            text = next(get_elements(rts, 'elements', 'text'), default=None)
             app.logger.warning(text)
             return text
     return None
@@ -38,7 +38,7 @@ def handle_url_verification(message):
 
 
 def handle_message(event):
-    message = Message(user=event['user'], message=get_text(event))
+    message = Message(user=event['user'], message=event)
     db.session.add(message)
     db.session.commit()
     return Response(status=201)
