@@ -111,7 +111,8 @@ def daily_report():
             "url": "https://letsparty-workspace.slack.com/archives/{}/p{}".format(
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
-            )
+            ),
+            "text": "Link"
         })
         message_list.append(
             {
