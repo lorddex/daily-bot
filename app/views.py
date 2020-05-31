@@ -41,6 +41,11 @@ def handle_message(event):
     message = Message(user=event['user'], message=event)
     db.session.add(message)
     db.session.commit()
+    client.reactions_add(
+        channel=event['channel'],
+        name="thumbsup",
+        timestamp=event['ts']
+    )
     return Response(status=201)
 
 #    client.chat_postMessage(
