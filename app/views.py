@@ -101,14 +101,21 @@ def hello_world_read():
 def daily_report():
     app.logger.warning(request.form)
     messages = db.session.query(Message).filter_by(
-        user='UHHPEMDDM',
+        user=request.form['user_id'],
     )
     message_list = []
     for m in messages:
-        message_list.append({
-            "type": "text",
-            "text": str(m)
-        })
+        message_list.append(
+            {
+                "type": "rich_text_section",
+                "elements": [
+                    {
+                        "type": "text",
+                        "text": str(m)
+                    }
+                ]
+            }
+        )
     return Response(
         json.dumps({
             "blocks": [
@@ -117,12 +124,7 @@ def daily_report():
                     "elements": [
                         {
                             "type": "rich_text_list",
-                            "elements": [
-                                {
-                                    "type": "rich_text_section",
-                                    "elements": message_list
-                                }
-                            ],
+                            "elements": message_list,
                             "style": "bullet",
                             "indent": 0
                         },
