@@ -109,7 +109,7 @@ def daily_report():
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "Found {} messages".format(len(messages))
+                        "text": "Found {} messages".format(messages.count())
                     }
                 },
                 {
