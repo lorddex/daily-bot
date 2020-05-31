@@ -2,7 +2,6 @@ import json
 import os
 
 from slack import WebClient
-from slack.errors import SlackApiError
 
 from flask import request, Response
 
@@ -140,4 +139,4 @@ def daily_clean_all():
         user=request.form['user_id'],
     ).delete()
     db.session.commit()
-    return Response(status=200)
+    return Response('Messages removed', status=200)
