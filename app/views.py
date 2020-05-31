@@ -111,8 +111,7 @@ def daily_report():
                 "elements": m.message['blocks'][0]['elements']
             }
         )
-    return Response(
-        json.dumps({
+    response_message = {
             "blocks": [
                 {
                     "type": "rich_text",
@@ -126,7 +125,10 @@ def daily_report():
                     ]
                 }
             ]
-        }), status=200, headers={
+        }
+    app.logger.warning(response_message)
+    return Response(
+        json.dumps(), status=200, headers={
             'Content-type': 'application/json'
         }
     )
