@@ -112,7 +112,7 @@ def daily_report():
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
             ),
-            "text": "Link"
+            "text": " Link "
         })
         message_list.append(
             {
