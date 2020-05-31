@@ -22,13 +22,10 @@ def get_elements(arr, type):
 
 def get_text(event):
     rt = get_elements(event['blocks'], 'rich_text')
-    app.logger.warning(rt)
     if rt:
         rts = get_elements(next(rt)['elements'], 'rich_text_section')
-        app.logger.warning(rts)
         if rts:
             text = next(get_elements(rts, 'elements', 'text'), default=None)
-            app.logger.warning(text)
             return text
     return None
 
@@ -47,11 +44,6 @@ def handle_message(event):
         timestamp=event['ts']
     )
     return Response(status=201)
-
-#    client.chat_postMessage(
-#        channel='#test1',
-#        text="Hello world!")
-
 
 HANDLERS = {
     'event_callback': {
@@ -73,7 +65,6 @@ def get_handler(event, handlers=HANDLERS):
 
 def unwrap_event():
     body = request.get_json()
-    app.logger.warning(json.dumps(body))
     return body
 
 
@@ -97,9 +88,8 @@ def hello_world_read():
     return '{} {}'.format(instance.user, instance.message)
 
 
-@app.route('/daily-report', methods=['POST'])
+@app.route('/report', methods=['POST'])
 def daily_report():
-    app.logger.warning(request.form)
     messages = db.session.query(Message).filter_by(
         user=request.form['user_id'],
     )
@@ -135,9 +125,17 @@ def daily_report():
                 }
             ]
         }
-    app.logger.warning(response_message)
     return Response(
         json.dumps(response_message), status=200, headers={
             'Content-type': 'application/json'
         }
     )
+
+
+@app.route('/clean-all', methods=['POST'])
+def daily_clean_all():
+    db.session.query(Message).filter_by(
+        user=request.form['user_id'],
+    ).delete()
+    db.session.commit()
+    return Response(status=200)
