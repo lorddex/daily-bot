@@ -99,6 +99,9 @@ def hello_world_read():
 
 @app.route('/daily-report', methods=['POST'])
 def daily_report():
+    messages = db.session.query(Message).filter_by(
+        user='UHHPEMDDM',
+    )
     return Response(
         json.dumps({
             "blocks": [
@@ -106,7 +109,7 @@ def daily_report():
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "*It's 80 degrees right now.*"
+                        "text": "Found {} messages".format(len(messages))
                     }
                 },
                 {
