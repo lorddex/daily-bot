@@ -8,9 +8,8 @@ from flask import request, Response
 from app import app, db
 from app.models import Message
 
-SLACK_VER_TOKEN = os.environ.get('SLACK_VER_TOKEN', '')
+
 SLACK_OAUTH_TOKEN = os.environ.get('SLACK_OAUTH_TOKEN', '')
-SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 
 client = WebClient(token=SLACK_OAUTH_TOKEN)
 
