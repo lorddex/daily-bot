@@ -23,6 +23,8 @@ class SlackSignCheckMiddleware(object):
     def __call__(self, environ, start_response):
         request = Request(environ)
         sign = request.headers.get('x-slack-signature')
+        self.app.logger.warning(request.get_json())
+        self.app.logger.warning(SLACK_SIGN_SECRET)
         if sign != hmac_sign(SLACK_SIGN_SECRET, request.get_json()):
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
             return res(environ, start_response)
