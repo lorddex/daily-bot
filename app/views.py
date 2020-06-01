@@ -6,7 +6,7 @@ from slack import WebClient
 from flask import request, Response
 
 from app import app, db
-from app.middleware import check_signature
+from app.utils import check_signature
 from app.models import Message
 
 
