@@ -11,7 +11,7 @@ SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 
 def hmac_sign(secret: str, message: str):
     signature = hmac.new(
-        secret, message, digestmod=hashlib.sha256
+        bytes(secret, "utf-8"), bytes(message, "utf-8"), digestmod=hashlib.sha256
     ).hexdigest()
 
     return 'v0=' + signature
@@ -31,7 +31,7 @@ class SlackSignCheckMiddleware(object):
         sign = request.headers.get('X-Slack-Signature')
         self.app.logger.warning(sign)
         body = str(request.data)
-        calc_sign = hmac_sign(SLACK_SIGN_SECRET, 'v0:' + str(timestamp) + ':' + body)
+        calc_sign = hmac_sign(SLACK_SIGN_SECRET, 'v0:' + timestamp + ':' + body)
         self.app.logger.warning(calc_sign)
         if sign != calc_sign:
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
