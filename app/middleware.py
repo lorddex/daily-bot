@@ -39,5 +39,4 @@ class SlackSignCheckMiddleware(object):
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
             return res(environ, start_response)
 
-        self.app.logger.warning('OK')
         return self.app(environ, start_response)
