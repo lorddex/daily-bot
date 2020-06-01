@@ -6,6 +6,7 @@ from slack import WebClient
 from flask import request, Response
 
 from app import app, db
+from app.middleware import check_signature
 from app.models import Message
 
 
@@ -67,6 +68,7 @@ def unwrap_event():
 
 
 @app.route('/', methods=['POST'])
+@check_signature
 def message_received():
     if not request.is_json:
         return Response(status=204)
@@ -87,6 +89,7 @@ def hello_world_read():
 
 
 @app.route('/report', methods=['POST'])
+@check_signature
 def daily_report():
     messages = db.session.query(Message).filter_by(
         user=request.form['user_id'],
@@ -133,6 +136,7 @@ def daily_report():
 
 
 @app.route('/clean-all', methods=['POST'])
+@check_signature
 def daily_clean_all():
     db.session.query(Message).filter_by(
         user=request.form['user_id'],
