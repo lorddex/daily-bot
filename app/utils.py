@@ -30,7 +30,7 @@ def check_signature(func):
             return Response(u'Missing timestamp, sign or body', mimetype='text/plain', status=400)
 
         now = datetime.datetime.now()
-        if abs(now - datetime.datetime.fromtimestamp(float(timestamp))) > 60 * 5:
+        if now > datetime.datetime.fromtimestamp(float(timestamp)) + datetime.timedelta(0, 60*5):
             return Response(u'Expired signature', mimetype='text/plain', status=400)
 
         to_sign = SLACK_SIGN_VERSION + ':' + timestamp + ':' + body
