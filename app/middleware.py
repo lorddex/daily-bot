@@ -58,7 +58,7 @@ def check_signature(func):
         to_sign = SLACK_SIGN_VERSION + ':' + timestamp + ':' + body
         calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
 
-        if not hmac.compare_digest(sign, calc_sign):
+        if hmac.compare_digest(sign, calc_sign):
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
             return res
 
