@@ -44,6 +44,7 @@ def handle_message(event):
     )
     return Response(status=201)
 
+
 HANDLERS = {
     'event_callback': {
         'app_mention': handle_message,
