@@ -7,14 +7,14 @@ import datetime
 from flask import Request, Response
 
 SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
-
+SLACK_SIGN_VERSION = 'v0'
 
 def hmac_sign(secret: str, message: str):
     signature = hmac.new(
         bytes(secret, "utf-8"), bytes(message, "utf-8"), digestmod=hashlib.sha256
     ).hexdigest()
 
-    return 'v0=' + signature
+    return SLACK_SIGN_VERSION + '=' + signature
 
 
 class SlackSignCheckMiddleware(object):
@@ -30,7 +30,7 @@ class SlackSignCheckMiddleware(object):
         #    return
         sign = request.headers.get('X-Slack-Signature')
         self.app.logger.warning(sign)
-        to_sign = 'v0:' + timestamp + ':' + str(request.data)
+        to_sign = SLACK_SIGN_VERSION + ':' + timestamp + ':' + request.get_data().decode("utf-8")
         self.app.logger.warning(to_sign)
         calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
         self.app.logger.warning(calc_sign)
