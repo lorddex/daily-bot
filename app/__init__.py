@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app.middleware import SlackSignCheckMiddleware
 
 app = Flask(__name__, static_folder=None)
-app.wsgi_app = SlackSignCheckMiddleware(app.wsgi_app)
+app.wsgi_app = SlackSignCheckMiddleware(app)
 
 # app configuration
 app_settings = os.getenv(
