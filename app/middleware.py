@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 import os
 import datetime
 
@@ -8,6 +7,7 @@ from flask import Request, Response
 
 SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
 SLACK_SIGN_VERSION = 'v0'
+
 
 def hmac_sign(secret: str, message: str):
     signature = hmac.new(
@@ -29,11 +29,11 @@ class SlackSignCheckMiddleware(object):
         #if now.timestamp() - timestamp > 60 * 5:
         #    return
         sign = request.headers.get('X-Slack-Signature')
-        self.app.logger.warning(sign)
+        self.app.logger.warning('SIGNATURE: ' + sign)
         to_sign = SLACK_SIGN_VERSION + ':' + timestamp + ':' + request.get_data().decode("utf-8")
-        self.app.logger.warning(to_sign)
+        self.app.logger.warning('TO SIGN: ' + to_sign)
         calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
-        self.app.logger.warning(calc_sign)
+        self.app.logger.warning('SIGNED: ' + calc_sign)
         if sign != calc_sign:
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
             return res(environ, start_response)
