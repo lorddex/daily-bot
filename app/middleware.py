@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import json
 import os
 
 from flask import Request, Response
@@ -23,7 +24,7 @@ class SlackSignCheckMiddleware(object):
     def __call__(self, environ, start_response):
         request = Request(environ)
         sign = request.headers.get('x-slack-signature')
-        if sign != hmac_sign(SLACK_SIGN_SECRET, request.get_json()):
+        if sign != hmac_sign(SLACK_SIGN_SECRET, json.dumps(request.get_json())):
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
             return res(environ, start_response)
         return self.app(environ, start_response)
