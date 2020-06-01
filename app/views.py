@@ -1,5 +1,4 @@
 import json
-import os
 
 from slack import WebClient
 
@@ -10,9 +9,7 @@ from app.utils import check_signature
 from app.models import Message
 
 
-SLACK_OAUTH_TOKEN = os.environ.get('SLACK_OAUTH_TOKEN', '')
-
-client = WebClient(token=SLACK_OAUTH_TOKEN)
+client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
 
 
 def get_elements(arr, type):

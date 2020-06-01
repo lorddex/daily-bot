@@ -7,3 +7,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
+    SLACK_SIGN_VERSION = 'v0'
+    SLACK_OAUTH_TOKEN = os.environ.get('SLACK_OAUTH_TOKEN', '')

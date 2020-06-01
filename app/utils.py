@@ -6,8 +6,7 @@ import datetime
 
 from flask import Response, request
 
-SLACK_SIGN_SECRET = os.environ.get('SLACK_SIGN_SECRET', '')
-SLACK_SIGN_VERSION = 'v0'
+from app import app
 
 
 def hmac_sign(secret: str, message: str) -> str:
@@ -15,7 +14,7 @@ def hmac_sign(secret: str, message: str) -> str:
         bytes(secret, "utf-8"), bytes(message, "utf-8"), digestmod=hashlib.sha256
     ).hexdigest()
 
-    return SLACK_SIGN_VERSION + '=' + signature
+    return app.config['SLACK_SIGN_VERSION'] + '=' + signature
 
 
 def check_signature(func):
@@ -33,8 +32,8 @@ def check_signature(func):
         if now > datetime.datetime.fromtimestamp(float(timestamp)) + datetime.timedelta(0, 60*5):
             return Response(u'Expired signature', mimetype='text/plain', status=400)
 
-        to_sign = SLACK_SIGN_VERSION + ':' + timestamp + ':' + body
-        calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
+        to_sign = app.config['SLACK_SIGN_VERSION'] + ':' + timestamp + ':' + body
+        calc_sign = hmac_sign(app.config['SLACK_SIGN_SECRET'], to_sign)
 
         if not hmac.compare_digest(sign, calc_sign):
             return Response(u'Authorization failed', mimetype='text/plain', status=401)
