@@ -30,8 +30,8 @@ class SlackSignCheckMiddleware(object):
         #    return
         sign = request.headers.get('X-Slack-Signature')
         self.app.logger.warning(sign)
-        body = str(request.data)
-        calc_sign = hmac_sign(SLACK_SIGN_SECRET, 'v0:' + timestamp + ':' + body)
+        to_sign = 'v0:' + timestamp + ':' + str(request.data)
+        calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
         self.app.logger.warning(calc_sign)
         if sign != calc_sign:
             res = Response(u'Authorization failed', mimetype='text/plain', status=401)
