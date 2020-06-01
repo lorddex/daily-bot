@@ -68,6 +68,7 @@ def unwrap_event():
 
 @app.route('/', methods=['POST'])
 def message_received():
+    app.logger.warning('METHOD')
     if not request.is_json:
         return Response(status=204)
 
