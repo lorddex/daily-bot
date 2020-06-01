@@ -31,6 +31,7 @@ class SlackSignCheckMiddleware(object):
         sign = request.headers.get('X-Slack-Signature')
         self.app.logger.warning(sign)
         to_sign = 'v0:' + timestamp + ':' + str(request.data)
+        self.app.logger.warning(to_sign)
         calc_sign = hmac_sign(SLACK_SIGN_SECRET, to_sign)
         self.app.logger.warning(calc_sign)
         if sign != calc_sign:
