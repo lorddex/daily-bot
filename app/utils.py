@@ -10,7 +10,7 @@ from app import app
 
 def hmac_sign(secret: str, message: str) -> str:
     signature = hmac.new(
-        bytes(secret, "utf-8"), bytes(message, "utf-8"), digestmod=hashlib.sha256
+        bytes(secret, 'utf-8'), bytes(message, 'utf-8'), digestmod=hashlib.sha256
     ).hexdigest()
 
     return app.config['SLACK_SIGN_VERSION'] + '=' + signature
@@ -22,7 +22,7 @@ def check_signature(func):
     def wrapper(*args, **kwargs):
         timestamp = request.headers.get('X-Slack-Request-Timestamp')
         sign = request.headers.get('X-Slack-Signature')
-        body = request.get_data().decode("utf-8")
+        body = request.get_data().decode('utf-8')
 
         if not timestamp or not sign or not body:
             return Response(u'Missing timestamp, sign or body', mimetype='text/plain', status=400)

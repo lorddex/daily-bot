@@ -1,31 +1,11 @@
 import json
 
-from slack import WebClient
-
 from flask import request, Response
 
 from app import app, db
+from app.handlers import handle_message, handle_url_verification
 from app.utils import check_signature
 from app.models import Message
-
-
-client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
-
-
-def handle_url_verification(message):
-    return Response(message['challenge'], status=200)
-
-
-def handle_message(event):
-    message = Message(user=event['user'], message=event)
-    db.session.add(message)
-    db.session.commit()
-    client.reactions_add(
-        channel=event['channel'],
-        name="thumbsup",
-        timestamp=event['ts']
-    )
-    return Response(status=201)
 
 
 HANDLERS = {
@@ -69,7 +49,7 @@ def message_received():
 @app.route('/read')
 def hello_world_read():
     instance = db.session.query(Message).order_by(Message.id.desc()).first()
-    return '{} {}'.format(instance.user, instance.message)
+    return u'{} {}'.format(instance.user, instance.message)
 
 
 @app.route('/report', methods=['POST'])
@@ -78,36 +58,38 @@ def daily_report():
     messages = db.session.query(Message).filter_by(
         user=request.form['user_id'],
     )
+
     if messages.count() == 0:
-        return Response('No messages found', status=200)
+        return Response(u'No messages found', mimetype='text/plain', status=200)
+
     message_list = []
     for m in messages:
         message_elements = m.message['blocks'][0]['elements'][0]['elements']
         message_elements.append({
-            "type": "link",
-            "url": "https://{}.slack.com/archives/{}/p{}".format(
+            'type': 'link',
+            'url': 'https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
             ),
-            "text": " Link "
+            'text': ' Link '
         })
         message_list.append(
             {
-                "type": "rich_text_section",
-                "elements": message_elements
+                'type': 'rich_text_section',
+                'elements': message_elements
             }
         )
     response_message = {
-            "blocks": [
+            'blocks': [
                 {
-                    "type": "rich_text",
-                    "elements": [
+                    'type': 'rich_text',
+                    'elements': [
                         {
-                            "type": "rich_text_list",
-                            "elements": message_list,
-                            "style": "bullet",
-                            "indent": 0
+                            'type': 'rich_text_list',
+                            'elements': message_list,
+                            'style': 'bullet',
+                            'indent': 0
                         },
                     ]
                 }
@@ -127,4 +109,4 @@ def daily_clean_all():
         user=request.form['user_id'],
     ).delete()
     db.session.commit()
-    return Response('Messages removed', status=200)
+    return Response(u'Messages removed', mimetype='text/plain', status=200)

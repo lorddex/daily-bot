@@ -36,4 +36,4 @@ Configure two commands:
 * DATABASE_URL:      Contains the DB URL that can be used to configure the DB
 * SLACK_OAUTH_TOKEN: OAuth token used to post messages/reactions
 * SLACK_SIGN_SECRET: Sign Secret
-* SLACK_VER_TOKEN:   Verification Token
+* SLACK_WORKSPACE:   The workspace where the bot is linked
