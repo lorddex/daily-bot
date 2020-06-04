@@ -12,20 +12,6 @@ from app.models import Message
 client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
 
 
-def get_elements(arr, type):
-    return [a for a in arr if a['type'] == type]
-
-
-def get_text(event):
-    rt = get_elements(event['blocks'], 'rich_text')
-    if rt:
-        rts = get_elements(next(rt)['elements'], 'rich_text_section')
-        if rts:
-            text = next(get_elements(rts, 'elements', 'text'), default=None)
-            return text
-    return None
-
-
 def handle_url_verification(message):
     return Response(message['challenge'], status=200)
 
@@ -99,7 +85,8 @@ def daily_report():
         message_elements = m.message['blocks'][0]['elements'][0]['elements']
         message_elements.append({
             "type": "link",
-            "url": "https://letsparty-workspace.slack.com/archives/{}/p{}".format(
+            "url": "https://{}.slack.com/archives/{}/p{}".format(
+                app.config['SLACK_WORKSPACE'],
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
             ),

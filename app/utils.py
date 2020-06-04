@@ -1,7 +1,6 @@
 import functools
 import hashlib
 import hmac
-import os
 import datetime
 
 from flask import Response, request
