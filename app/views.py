@@ -3,53 +3,40 @@ import json
 from flask import request, Response
 
 from app import app, db
-from app.handlers import handle_message, handle_url_verification
+from app.handlers import get_handler
 from app.utils import check_signature
 from app.models import Message
-
-
-HANDLERS = {
-    'event_callback': {
-        'app_mention': handle_message,
-        'message': handle_message,
-    },
-    'url_verification': handle_url_verification,
-}
-
-
-def get_handler(event, handlers=HANDLERS):
-    if handlers[event['type']]:
-        handler = handlers[event['type']]
-        if isinstance(handler, dict):
-            return get_handler(event['event'], handlers=handler)
-        return handler, event
-    return None, None
-
-
-def unwrap_event():
-    body = request.get_json()
-    return body
 
 
 @app.route('/', methods=['POST'])
 @check_signature
 def message_received():
     if not request.is_json:
-        return Response(status=204)
+        return Response(status=200)
 
-    event = unwrap_event()
-    handler, event = get_handler(event)
-    response = Response(status=204)
+    event = request.get_json()
+    handler, event = get_handler(event['type'], event)
+
     if handler:
         response = handler(event)
+    else:
+        response = Response(status=204)
 
     return response
 
 
-@app.route('/read')
-def hello_world_read():
-    instance = db.session.query(Message).order_by(Message.id.desc()).first()
-    return u'{} {}'.format(instance.user, instance.message)
+@app.route('/interactive', methods=['POST'])
+@check_signature
+def interactive_response_received():
+    event = json.loads(request.form['payload'])
+    handler, event = get_handler(event['type'], event)
+
+    if handler:
+        response = handler(event)
+    else:
+        response = Response(status=204)
+
+    return response
 
 
 @app.route('/report', methods=['POST'])
@@ -77,7 +64,7 @@ def daily_report():
         message_list.append(
             {
                 'type': 'rich_text_section',
-                'elements': message_elements
+                'elements': message_elements,
             }
         )
     response_message = {
@@ -89,15 +76,38 @@ def daily_report():
                             'type': 'rich_text_list',
                             'elements': message_list,
                             'style': 'bullet',
-                            'indent': 0
+                            'indent': 0,
                         },
+                    ],
+                },
+            ],
+            'attachments': [
+                {
+                    'fallback': 'Would you like to remove the stored messages?',
+                    'title': 'Would you like to remove the stored messages?',
+                    'callback_id': 'daily_0000_remove_messages',
+                    'color': '#3AA3E3',
+                    'attachment_type': 'default',
+                    'actions': [
+                        {
+                            'name': 'delete',
+                            'text': 'Yes, delete them!',
+                            'type': 'button',
+                            'value': 'delete'
+                        },
+                        {
+                            'name': 'no',
+                            'text': 'No',
+                            'type': 'button',
+                            'value': 'no'
+                        }
                     ]
                 }
-            ]
+            ],
         }
     return Response(
         json.dumps(response_message), status=200, headers={
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
         }
     )
 
