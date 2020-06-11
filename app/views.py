@@ -2,10 +2,9 @@ import json
 
 from flask import request, Response
 
-from app import app, db
+from app import app
 from app.handlers import get_handler
 from app.utils import check_signature
-from app.models import Message
 
 
 @app.route('/', methods=['POST'])
@@ -42,81 +41,19 @@ def interactive_response_received():
 @app.route('/report', methods=['POST'])
 @check_signature
 def daily_report():
-    messages = db.session.query(Message).filter_by(
-        user=request.form['user_id'],
-    )
-
-    if messages.count() == 0:
-        return Response(u'No messages found', mimetype='text/plain', status=200)
-
-    message_list = []
-    for m in messages:
-        message_elements = m.message['blocks'][0]['elements'][0]['elements']
-        message_elements.append({
-            'type': 'link',
-            'url': 'https://{}.slack.com/archives/{}/p{}'.format(
-                app.config['SLACK_WORKSPACE'],
-                m.message['channel'],
-                m.message['event_ts'].replace('.', '')
-            ),
-            'text': ' Link '
-        })
-        message_list.append(
-            {
-                'type': 'rich_text_section',
-                'elements': message_elements,
-            }
-        )
-    response_message = {
-            'blocks': [
-                {
-                    'type': 'rich_text',
-                    'elements': [
-                        {
-                            'type': 'rich_text_list',
-                            'elements': message_list,
-                            'style': 'bullet',
-                            'indent': 0,
-                        },
-                    ],
-                },
-            ],
-            'attachments': [
-                {
-                    'fallback': 'Would you like to remove the stored messages?',
-                    'title': 'Would you like to remove the stored messages?',
-                    'callback_id': 'daily_0000_remove_messages',
-                    'color': '#3AA3E3',
-                    'attachment_type': 'default',
-                    'actions': [
-                        {
-                            'name': 'delete',
-                            'text': 'Yes, delete them!',
-                            'type': 'button',
-                            'value': 'delete'
-                        },
-                        {
-                            'name': 'no',
-                            'text': 'No',
-                            'type': 'button',
-                            'value': 'no'
-                        }
-                    ]
-                }
-            ],
-        }
-    return Response(
-        json.dumps(response_message), status=200, headers={
-            'Content-type': 'application/json',
-        }
-    )
+    handler, event = get_handler('daily-report', request.form)
+    return handler(request.form)
 
 
 @app.route('/clean-all', methods=['POST'])
 @check_signature
 def daily_clean_all():
-    db.session.query(Message).filter_by(
-        user=request.form['user_id'],
-    ).delete()
-    db.session.commit()
-    return Response(u'Messages removed', mimetype='text/plain', status=200)
+    handler, event = get_handler('daily-clean-all', request.form)
+    return handler(request.form)
+
+
+@app.route('/add', methods=['POST'])
+@check_signature
+def daily_add():
+    handler, event = get_handler('daily-add', request.form)
+    return handler(request.form)

@@ -4,6 +4,8 @@ from flask import Response
 from slack import WebClient
 
 from app import db, app
+from app.message_templates import build_daily_report_message, build_section_with_text, \
+    build_simple_text, build_link
 from app.models import Message
 
 
@@ -18,7 +20,13 @@ def handle_message(event):
     # subtype messages are not supported
     if 'subtype' in event:
         return Response(status=204)
-    message = Message(user=event['user'], message=event)
+    message_elements = event['blocks'][0]['elements'][0]['elements']
+    message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
+            app.config['SLACK_WORKSPACE'],
+            event['channel'],
+            event['event_ts'].replace('.', '')
+        ), ' Link '))
+    message = Message(user=event['user'], message=message_elements)
     db.session.add(message)
     db.session.commit()
     client.reactions_add(
@@ -29,20 +37,78 @@ def handle_message(event):
     return Response(status=201)
 
 
+# not currently used
 def handle_interactive_message(event):
     '''
         Valid responses are:
         * delete
     '''
+    messages = db.session.query(Message).filter_by(
+        user=event['user']['id'],
+    )
+
+    if messages.count() == 0:
+        return Response(
+            json.dumps(build_section_with_text('No messages found')),
+            status=200,
+            headers={
+                'Content-type': 'application/json',
+            }
+        )
+
     if event['actions'][0]['value'] == 'delete':
         db.session.query(Message).filter_by(
             user=event['user']['id'],
         ).delete()
         db.session.commit()
-    #return Response(json.dumps({}), status=200, headers={
-    #        'Content-type': 'application/json',
-    #    })
+
     return Response(status=200)
+
+
+def handle_daily_add(event):
+    message = Message(user=event['user_id'], message=[build_simple_text(event['text'])])
+    db.session.add(message)
+    db.session.commit()
+    return Response(
+        json.dumps(build_section_with_text(f'Message {event["text"]} added')),
+        status=200,
+        headers={
+            'Content-type': 'application/json',
+        }
+    )
+
+
+def handle_daily_report(event):
+    messages = db.session.query(Message).filter_by(
+        user=event['user_id'],
+    )
+
+    if messages.count() == 0:
+        return Response(
+            json.dumps(build_section_with_text('No messages found')),
+            status=200,
+            headers={
+                'Content-type': 'application/json',
+            }
+        )
+
+    response_message = build_daily_report_message(messages)
+    app.logger.warning(json.dumps(response_message))
+    return Response(
+        json.dumps(response_message),
+        status=200,
+        headers={
+            'Content-type': 'application/json',
+        }
+    )
+
+
+def handle_daily_clean_all(event):
+    db.session.query(Message).filter_by(
+        user=event['user_id'],
+    ).delete()
+    db.session.commit()
+    return Response(u'Messages removed', mimetype='text/plain', status=200)
 
 
 HANDLERS = {
@@ -56,12 +122,14 @@ HANDLERS = {
     'interactive_message': {
         'field': 'callback_id',
         'daily_0000_remove_messages': handle_interactive_message,
-    }
+    },
+    'daily-report': handle_daily_report,
+    'daily-clean-all': handle_daily_clean_all,
+    'daily-add': handle_daily_add,
 }
 
 
 def get_handler(key, event, handlers=HANDLERS):
-    app.logger.warning(f'--- KEY: {key} --- {event}')
     if not isinstance(handlers, dict):
         return None, None
 
