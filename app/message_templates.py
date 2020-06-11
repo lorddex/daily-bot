@@ -6,14 +6,14 @@ def build_link(link, text):
     }
 
 
-def build_simple_text(message):
+def build_text(message):
     return {
             "type": "text",
             "text": message,
         }
 
 
-def build_section_with_text(message):
+def build_bloc_section_plain_text(message):
     return {
             "blocks": [
                 {
@@ -28,9 +28,29 @@ def build_section_with_text(message):
         }
 
 
+def build_section_plain_text(text):
+    return {
+        "type": "section",
+        "fields": [
+            {
+                "type": "plain_text",
+                "text": text,
+                "emoji": True
+            }
+        ]
+    }
+
+
 def build_daily_report_message(messages):
     message_list = []
+    date = None
     for m in messages:
+        t_date = m.created.strftime("%d/%m/%Y")
+        if date is None:
+            date = t_date
+            message_list.append(
+                build_section_plain_text(date)
+            )
         message_list.append(
             {
                 'type': 'rich_text_section',

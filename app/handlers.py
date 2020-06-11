@@ -4,8 +4,8 @@ from flask import Response
 from slack import WebClient
 
 from app import db, app
-from app.message_templates import build_daily_report_message, build_section_with_text, \
-    build_simple_text, build_link
+from app.message_templates import build_daily_report_message, build_bloc_section_plain_text, \
+    build_text, build_link
 from app.models import Message
 
 
@@ -49,7 +49,7 @@ def handle_interactive_message(event):
 
     if messages.count() == 0:
         return Response(
-            json.dumps(build_section_with_text('No messages found')),
+            json.dumps(build_bloc_section_plain_text('No messages found')),
             status=200,
             headers={
                 'Content-type': 'application/json',
@@ -66,11 +66,11 @@ def handle_interactive_message(event):
 
 
 def handle_daily_add(event):
-    message = Message(user=event['user_id'], message=[build_simple_text(event['text'])])
+    message = Message(user=event['user_id'], message=[build_text(event['text'])])
     db.session.add(message)
     db.session.commit()
     return Response(
-        json.dumps(build_section_with_text(f'Message {event["text"]} added')),
+        json.dumps(build_bloc_section_plain_text(f'Message {event["text"]} added')),
         status=200,
         headers={
             'Content-type': 'application/json',
@@ -81,11 +81,11 @@ def handle_daily_add(event):
 def handle_daily_report(event):
     messages = db.session.query(Message).filter_by(
         user=event['user_id'],
-    )
+    ).order_by(Message.created)
 
     if messages.count() == 0:
         return Response(
-            json.dumps(build_section_with_text('No messages found')),
+            json.dumps(build_bloc_section_plain_text('No messages found')),
             status=200,
             headers={
                 'Content-type': 'application/json',
