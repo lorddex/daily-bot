@@ -41,26 +41,29 @@ def build_section_plain_text(text):
     }
 
 
+def build_rich_text_rich_text_list(list_elements):
+    return {
+        'type': 'rich_text',
+        'elements': [
+            {
+                'type': 'rich_text_list',
+                'elements': list_elements,
+                'style': 'bullet',
+                'indent': 0,
+            },
+        ],
+    }
+
+
 def build_daily_report_message(messages):
     blocks = []
     list_elements = []
     date = None
     for m in messages:
-        t_date = m.created.strftime("*%a %d/%m/%Y*")
+        t_date = m.created.strftime("%a %d/%m/%Y")
         if date is None or date != t_date:
             if date != t_date:
-                blocks.append(
-                    {
-                        'type': 'rich_text',
-                        'elements': [
-                            {
-                                'type': 'rich_text_list',
-                                'elements': list_elements,
-                                'style': 'bullet',
-                                'indent': 0,
-                            },
-                        ],
-                    })
+                blocks.append(build_rich_text_rich_text_list(list_elements))
                 list_elements = []
             date = t_date
             blocks.append(
@@ -72,18 +75,7 @@ def build_daily_report_message(messages):
                 'elements': m.message,
             }
         )
-    blocks.append(
-        {
-            'type': 'rich_text',
-            'elements': [
-                {
-                    'type': 'rich_text_list',
-                    'elements': list_elements,
-                    'style': 'bullet',
-                    'indent': 0,
-                },
-            ],
-        })
+    blocks.append(build_rich_text_rich_text_list(list_elements))
     response_message = {
         'blocks': blocks
     }
