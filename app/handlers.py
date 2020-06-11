@@ -93,7 +93,6 @@ def handle_daily_report(event):
         )
 
     response_message = build_daily_report_message(messages)
-    app.logger.warning(json.dumps(response_message))
     return Response(
         json.dumps(response_message),
         status=200,
