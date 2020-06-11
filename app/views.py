@@ -8,7 +8,6 @@ from app.utils import check_signature
 
 
 @app.route('/', methods=['POST'])
-@check_signature
 def message_received():
     if not request.is_json:
         return Response(status=200)
