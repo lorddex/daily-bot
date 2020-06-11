@@ -46,7 +46,7 @@ def build_daily_report_message(messages):
     list_elements = []
     date = None
     for m in messages:
-        t_date = m.created.strftime("%d/%m/%Y")
+        t_date = m.created.strftime("*%a %d/%m/%Y*")
         if date is None or date != t_date:
             if date != t_date:
                 blocks.append(
@@ -72,6 +72,18 @@ def build_daily_report_message(messages):
                 'elements': m.message,
             }
         )
+    blocks.append(
+        {
+            'type': 'rich_text',
+            'elements': [
+                {
+                    'type': 'rich_text_list',
+                    'elements': list_elements,
+                    'style': 'bullet',
+                    'indent': 0,
+                },
+            ],
+        })
     response_message = {
         'blocks': blocks
     }
