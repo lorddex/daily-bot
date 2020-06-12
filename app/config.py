@@ -14,3 +14,5 @@ class Config(object):
     SLACK_SIGN_VERSION = 'v0'
     SLACK_OAUTH_TOKEN = os.environ.get('SLACK_OAUTH_TOKEN', '')
     SLACK_WORKSPACE = os.environ.get('SLACK_WORKSPACE', '')
+
+    SLACK_VERIFICATION_ENABLED = os.environ.get('SLACK_VERIFICATION_ENABLED', False)

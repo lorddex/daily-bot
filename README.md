@@ -38,3 +38,4 @@ Configure two commands:
 * SLACK_OAUTH_TOKEN: OAuth token used to post messages/reactions
 * SLACK_SIGN_SECRET: Sign Secret
 * SLACK_WORKSPACE:   The workspace where the bot is linked
+* SLACK_VERIFICATION_ENABLED : Disable the authentication to allow the initial endpoint verification

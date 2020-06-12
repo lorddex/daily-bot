@@ -4,8 +4,12 @@ from flask import Response
 from slack import WebClient
 
 from app import db, app
-from app.message_templates import build_daily_report_message, build_bloc_section_plain_text, \
-    build_text, build_link
+from app.message_templates import (
+    build_daily_report_message,
+    build_bloc_section_plain_text,
+    build_text,
+    build_link,
+)
 from app.models import Message
 
 

@@ -20,6 +20,9 @@ def check_signature(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        if app.config['SLACK_VERIFICATION_ENABLED']:
+            return func(*args, **kwargs)
+
         timestamp = request.headers.get('X-Slack-Request-Timestamp')
         sign = request.headers.get('X-Slack-Signature')
         body = request.get_data().decode('utf-8')
