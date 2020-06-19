@@ -105,7 +105,7 @@ def handle_daily_report(event):
 
     for m in messages:
         params = {
-            'token': app.config['SLACK_OAUTH_TOKEN']
+            'token': app.config['SLACK_OAUTH_TOKEN'],
             'channel': m.message['channel'],
             'inclusive': True,
             'latest': m.message['ts'],
