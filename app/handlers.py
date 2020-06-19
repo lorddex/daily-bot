@@ -1,4 +1,5 @@
 import json
+import requests
 
 from flask import Response
 from slack import WebClient
@@ -103,12 +104,20 @@ def handle_daily_report(event):
         )
 
     for m in messages:
-        message = client.conversation_history(
-            channel=m.message['channel'],
-            inclusive=True,
-            latest=m.message['ts'],
-            limit=1
-        )['messages'][0]
+        res = requests.request(
+            'POST',
+            'https://www.slack.com/api/conversations.history',
+            headers={
+                'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN'])
+            },
+            data={
+                'channel': m.message['channel'],
+                'inclusive': True,
+                'latest': m.message['ts'],
+                'limit': 1,
+            },
+        )
+        app.logger.warning(res)
 
         message_elements = message['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
