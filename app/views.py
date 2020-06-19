@@ -50,10 +50,3 @@ def daily_report():
 def daily_clean_all():
     handler, event = get_handler('daily-clean-all', request.form)
     return handler(request.form)
-
-
-@app.route('/add', methods=['POST'])
-@check_signature
-def daily_add():
-    handler, event = get_handler('daily-add', request.form)
-    return handler(request.form)

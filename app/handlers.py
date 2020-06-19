@@ -40,25 +40,6 @@ def handle_message(event):
     return Response(status=201)
 
 
-def handle_daily_add(event):
-    app.logger.warning(json.dumps(event))
-    client.chat_postMessage(
-        channel=event['user_id'],
-        text=event['text'],
-        as_user=True,
-    )
-    #message = Message(user=event['user_id'], message=[build_text(event['text'])])
-    #db.session.add(message)
-    #db.session.commit()
-    return Response(
-        json.dumps(build_bloc_section_plain_text(f'Message {event["text"]} added')),
-        status=200,
-        headers={
-            'Content-type': 'application/json',
-        }
-    )
-
-
 def handle_daily_report(event):
     messages = db.session.query(Message).filter_by(
         user=event['user_id'],
@@ -126,7 +107,6 @@ HANDLERS = {
     },
     'daily-report': handle_daily_report,
     'daily-clean-all': handle_daily_clean_all,
-    'daily-add': handle_daily_add,
 }
 
 
