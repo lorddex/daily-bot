@@ -2,6 +2,8 @@
 
 This is a Flask app that can be used on Slack and that helps to track what are the tasks done by a user and create a daily report of them.
 
+*NOTE* Messages won't be stored into the bot database, only the data to get them from slack.
+
 ## Usage
 
 Send a private message to the Slack Bot linked to this application or tag the bot.
