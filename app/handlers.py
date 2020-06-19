@@ -125,6 +125,7 @@ def handle_daily_report(event):
         ), ' Link '))
 
     response_message = build_daily_report_message(messages)
+    app.logger.warning(response_message)
     return Response(
         json.dumps(response_message),
         status=200,
