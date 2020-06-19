@@ -21,18 +21,6 @@ def handle_url_verification(message):
     return Response(message['challenge'], mimetype='text/plain', status=200)
 
 
-def _event_clean_up(event):
-    """
-    Removes the text/blocks from the message in order to not store these into our DB.
-    """
-    copy = event.copy()
-    if 'text' in copy:
-        copy['text'] = ''
-    if 'blocks' in copy:
-        copy['blocks'] = []
-    return copy
-
-
 def handle_message(event):
     # subtype messages are not supported
     if 'subtype' in event:
@@ -53,9 +41,13 @@ def handle_message(event):
 
 
 def handle_daily_add(event):
-    message = Message(user=event['user_id'], message=[build_text(event['text'])])
-    db.session.add(message)
-    db.session.commit()
+    client.chat_postMessage(
+        channel=event['user_id'],
+        text=event['text'],
+    )
+    #message = Message(user=event['user_id'], message=[build_text(event['text'])])
+    #db.session.add(message)
+    #db.session.commit()
     return Response(
         json.dumps(build_bloc_section_plain_text(f'Message {event["text"]} added')),
         status=200,
