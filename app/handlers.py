@@ -43,6 +43,7 @@ def handle_message(event):
         event_ts=event['event_ts'],
         ts=event['ts'],
     )
+    app.logger.warning(f"{event['event_ts']} {event['ts']}")
     db.session.add(message)
     db.session.commit()
     client.reactions_add(
@@ -84,9 +85,9 @@ def handle_daily_report(event):
     for m in messages:
         params = {
             'token': app.config['SLACK_OAUTH_TOKEN'],
-            'channel': m.message['channel'],
+            'channel': m.channel,
             'inclusive': True,
-            'latest': m.message['ts'],
+            'latest': m.ts,
             'limit': 1,
         }
         res = requests.get(
@@ -98,8 +99,8 @@ def handle_daily_report(event):
         message_elements = message['messages'][0]['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],
-                m.message['channel'],
-                m.message['event_ts'].replace('.', '')
+                m.channel,
+                m.event_ts.replace('.', '')
         ), ' Link '))
         ms.append({'message': m, 'elements': message_elements})
 
