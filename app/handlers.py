@@ -44,6 +44,7 @@ def handle_daily_add(event):
     client.chat_postMessage(
         channel=event['user_id'],
         text=event['text'],
+        as_user=True,
     )
     #message = Message(user=event['user_id'], message=[build_text(event['text'])])
     #db.session.add(message)
