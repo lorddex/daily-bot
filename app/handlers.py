@@ -117,7 +117,7 @@ def handle_daily_report(event):
                 'limit': 1,
             },
         )
-        app.logger.warning(res)
+        app.logger.warning(res.json())
 
         message_elements = message['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
