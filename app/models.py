@@ -6,7 +6,6 @@ from app import db
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(120), index=True, unique=False, nullable=False)
-    message = db.Column(db.JSON(), index=False, unique=False, nullable=True)
     channel = db.Column(db.String(), index=False, unique=False, nullable=True)
     event_ts = db.Column(db.String(), index=False, unique=False, nullable=True)
     ts = db.Column(db.String(), index=False, unique=False, nullable=True)

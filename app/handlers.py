@@ -37,7 +37,12 @@ def handle_message(event):
     # subtype messages are not supported
     if 'subtype' in event:
         return Response(status=204)
-    message = Message(user=event['user'], message=_event_clean_up(event))
+    message = Message(
+        user=event['user'],
+        channel=event['channel'],
+        event_ts=event['event_ts'],
+        ts=event['ts'],
+    )
     db.session.add(message)
     db.session.commit()
     client.reactions_add(
@@ -46,34 +51,6 @@ def handle_message(event):
         timestamp=event['ts']
     )
     return Response(status=201)
-
-
-# not currently used
-def handle_interactive_message(event):
-    '''
-        Valid responses are:
-        * delete
-    '''
-    messages = db.session.query(Message).filter_by(
-        user=event['user']['id'],
-    )
-
-    if messages.count() == 0:
-        return Response(
-            json.dumps(build_bloc_section_plain_text('No messages found')),
-            status=200,
-            headers={
-                'Content-type': 'application/json',
-            }
-        )
-
-    if event['actions'][0]['value'] == 'delete':
-        db.session.query(Message).filter_by(
-            user=event['user']['id'],
-        ).delete()
-        db.session.commit()
-
-    return Response(status=200)
 
 
 def handle_daily_add(event):
@@ -155,7 +132,6 @@ HANDLERS = {
     'url_verification': handle_url_verification,
     'interactive_message': {
         'field': 'callback_id',
-        'daily_0000_remove_messages': handle_interactive_message,
     },
     'daily-report': handle_daily_report,
     'daily-clean-all': handle_daily_clean_all,
