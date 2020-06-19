@@ -106,6 +106,7 @@ def handle_daily_report(event):
     for m in messages:
         headers = {
             'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN'])
+            'Content-type': 'application/json',
         }
         body = {
             'channel': m.message['channel'],
@@ -113,11 +114,10 @@ def handle_daily_report(event):
             'latest': m.message['ts'],
             'limit': 1,
         }
-        res = requests.request(
-            'POST',
+        res = requests.post(
             'https://www.slack.com/api/conversations.history',
             headers=headers,
-            data=body
+            data=body,
         )
         app.logger.warning('{} {} {}'.format(headers, body, res.json()))
 
