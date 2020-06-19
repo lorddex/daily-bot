@@ -57,7 +57,7 @@ def handle_daily_report(event):
     ms = []
     for m in messages:
         message = get_slack_message(m.channel, m.ts)
-        message_elements = message['messages'][0]['blocks'][0]['elements'][0]['elements']
+        message_elements = message['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],
                 m.channel,
