@@ -20,17 +20,23 @@ def handle_url_verification(message):
     return Response(message['challenge'], mimetype='text/plain', status=200)
 
 
+def _event_clean_up(event):
+    """
+    Removes the text/blocks from the message in order to not store these into our DB.
+    """
+    copy = event.copy()
+    if 'text' in copy:
+        copy['text'] = ''
+    if 'blocks' in copy:
+        copy['blocks'] = []
+    return copy
+
+
 def handle_message(event):
     # subtype messages are not supported
     if 'subtype' in event:
         return Response(status=204)
-    message_elements = event['blocks'][0]['elements'][0]['elements']
-    message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
-            app.config['SLACK_WORKSPACE'],
-            event['channel'],
-            event['event_ts'].replace('.', '')
-        ), ' Link '))
-    message = Message(user=event['user'], message=message_elements)
+    message = Message(user=event['user'], message=_event_clean_up(event))
     db.session.add(message)
     db.session.commit()
     client.reactions_add(
@@ -95,6 +101,21 @@ def handle_daily_report(event):
                 'Content-type': 'application/json',
             }
         )
+
+    for m in messages:
+        message = client.conversation_history(
+            channel=m.message['channel'],
+            inclusive=True,
+            latest=m.message['ts'],
+            limit=1
+        )['messages'][0]
+
+        message_elements = message['blocks'][0]['elements'][0]['elements']
+        message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
+                app.config['SLACK_WORKSPACE'],
+                m['channel'],
+                m['event_ts'].replace('.', '')
+        ), ' Link '))
 
     response_message = build_daily_report_message(messages)
     return Response(
