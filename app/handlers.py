@@ -40,10 +40,8 @@ def handle_message(event):
     message = Message(
         user=event['user'],
         channel=event['channel'],
-        event_ts=event['event_ts'],
         ts=event['ts'],
     )
-    app.logger.warning(f"{event['event_ts']} {event['ts']}")
     db.session.add(message)
     db.session.commit()
     client.reactions_add(
@@ -100,7 +98,7 @@ def handle_daily_report(event):
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],
                 m.channel,
-                m.event_ts.replace('.', '')
+                m.ts.replace('.', '')
         ), ' Link '))
         ms.append({'message': m, 'elements': message_elements})
 
