@@ -12,7 +12,7 @@ from app.message_templates import (
     build_link,
 )
 from app.models import Message
-
+from app.utils import get_slack_message
 
 client = WebClient(token=app.config['SLACK_OAUTH_TOKEN'])
 
@@ -56,18 +56,7 @@ def handle_daily_report(event):
 
     ms = []
     for m in messages:
-        params = {
-            'token': app.config['SLACK_OAUTH_TOKEN'],
-            'channel': m.channel,
-            'inclusive': True,
-            'latest': m.ts,
-            'limit': 1,
-        }
-        res = requests.get(
-            'https://www.slack.com/api/conversations.history',
-            params=params,
-        )
-        message = res.json()
+        message = get_slack_message(m.channel, m.ts)
         message_elements = message['messages'][0]['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],

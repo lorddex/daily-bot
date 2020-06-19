@@ -2,7 +2,9 @@ import functools
 import hashlib
 import hmac
 import datetime
+import json
 
+import requests
 from flask import Response, request
 
 from app import app
@@ -43,3 +45,29 @@ def check_signature(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+class GetSlackMessageException(Exception):
+    pass
+
+
+def get_slack_message(channel, ts):
+    params = {
+        'token': app.config['SLACK_OAUTH_TOKEN'],
+        'channel': channel,
+        'inclusive': True,
+        'latest': ts,
+        'limit': 1,
+    }
+    res = requests.get(
+        'https://www.slack.com/api/conversations.history',
+        params=params,
+    )
+    json_res = res.json()
+    if not json_res['ok']:
+        raise GetSlackMessageException(
+            'Error while accessing the message: {}'.format(
+                json.dumps(json_res['errors']),
+            )
+        )
+    return res.json()['messages'][0]
