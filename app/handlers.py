@@ -104,22 +104,18 @@ def handle_daily_report(event):
         )
 
     for m in messages:
-        headers = {
-            'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN']),
-            'Content-type': 'application/json',
-        }
-        body = {
+        params = {
+            'token': app.config['SLACK_OAUTH_TOKEN']
             'channel': m.message['channel'],
             'inclusive': True,
             'latest': m.message['ts'],
             'limit': 1,
         }
-        res = requests.post(
+        res = requests.get(
             'https://www.slack.com/api/conversations.history',
-            headers=headers,
-            data=body,
+            params=params,
         )
-        app.logger.warning('{} {} {}'.format(headers, body, res.json()))
+        app.logger.warning('{} {}'.format(params, res.json()))
 
         #message_elements = message['blocks'][0]['elements'][0]['elements']
         #message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
