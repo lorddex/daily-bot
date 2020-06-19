@@ -60,7 +60,7 @@ def build_daily_report_message(messages):
     list_elements = []
     date = None
     for m in messages:
-        t_date = m.created.strftime("%a %d/%m/%Y")
+        t_date = m['message'].created.strftime("%a %d/%m/%Y")
         if date is None or date != t_date:
             if date != t_date:
                 blocks.append(build_rich_text_rich_text_list(list_elements))
