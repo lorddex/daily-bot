@@ -116,7 +116,7 @@ def handle_daily_report(event):
             params=params,
         )
         app.logger.warning('{} {}'.format(params, res.json()))
-        message = json.loads(res.json())
+        message = res.json()
         message_elements = message['messages'][0]['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
                 app.config['SLACK_WORKSPACE'],
