@@ -41,6 +41,7 @@ def handle_message(event):
 
 
 def handle_daily_add(event):
+    app.logger.warning(json.dumps(event))
     client.chat_postMessage(
         channel=event['user_id'],
         text=event['text'],
@@ -85,7 +86,6 @@ def handle_daily_report(event):
             'https://www.slack.com/api/conversations.history',
             params=params,
         )
-        app.logger.warning('{} {}'.format(params, res.json()))
         message = res.json()
         message_elements = message['messages'][0]['blocks'][0]['elements'][0]['elements']
         message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
@@ -96,7 +96,6 @@ def handle_daily_report(event):
         ms.append({'message': m, 'elements': message_elements})
 
     response_message = build_daily_report_message(ms)
-    app.logger.warning(response_message)
     return Response(
         json.dumps(response_message),
         status=200,
