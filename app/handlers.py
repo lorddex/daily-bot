@@ -105,7 +105,7 @@ def handle_daily_report(event):
 
     for m in messages:
         headers = {
-            'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN'])
+            'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN']),
             'Content-type': 'application/json',
         }
         body = {
