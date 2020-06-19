@@ -103,6 +103,7 @@ def handle_daily_report(event):
             }
         )
 
+    ms = []
     for m in messages:
         params = {
             'token': app.config['SLACK_OAUTH_TOKEN'],
@@ -123,8 +124,9 @@ def handle_daily_report(event):
                 m.message['channel'],
                 m.message['event_ts'].replace('.', '')
         ), ' Link '))
+        ms.append({'message': m, 'elements': message_elements})
 
-    response_message = build_daily_report_message(messages)
+    response_message = build_daily_report_message(ms)
     app.logger.warning(response_message)
     return Response(
         json.dumps(response_message),

@@ -72,7 +72,7 @@ def build_daily_report_message(messages):
         list_elements.append(
             {
                 'type': 'rich_text_section',
-                'elements': m.message,
+                'elements': m['elements'],
             }
         )
     blocks.append(build_rich_text_rich_text_list(list_elements))
