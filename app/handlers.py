@@ -104,27 +104,29 @@ def handle_daily_report(event):
         )
 
     for m in messages:
+        headers = {
+            'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN'])
+        }
+        body = {
+            'channel': m.message['channel'],
+            'inclusive': True,
+            'latest': m.message['ts'],
+            'limit': 1,
+        }
         res = requests.request(
             'POST',
             'https://www.slack.com/api/conversations.history',
-            headers={
-                'Authorizaton': 'Bearer {}'.format(app.config['SLACK_OAUTH_TOKEN'])
-            },
-            data={
-                'channel': m.message['channel'],
-                'inclusive': True,
-                'latest': m.message['ts'],
-                'limit': 1,
-            },
+            headers=headers,
+            data=body
         )
-        app.logger.warning(res.json())
+        app.logger.warning('{} {} {}'.format(headers, body, res.json()))
 
-        message_elements = message['blocks'][0]['elements'][0]['elements']
-        message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
-                app.config['SLACK_WORKSPACE'],
-                m['channel'],
-                m['event_ts'].replace('.', '')
-        ), ' Link '))
+        #message_elements = message['blocks'][0]['elements'][0]['elements']
+        #message_elements.append(build_link('https://{}.slack.com/archives/{}/p{}'.format(
+        #        app.config['SLACK_WORKSPACE'],
+        #        m['channel'],
+        #        m['event_ts'].replace('.', '')
+        #), ' Link '))
 
     response_message = build_daily_report_message(messages)
     return Response(
