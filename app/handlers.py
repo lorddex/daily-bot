@@ -26,12 +26,11 @@ def handle_message(event):
     if 'subtype' in event:
         return Response(status=204)
 
-    query = db.session.query(Message).filter(
+    if db.session.query(exists().where(
         Message.user == event['user'],
         Message.channel == event['channel'],
         Message.ts == event['ts'],
-    )
-    if db.session.query(query.exists()).scalar():
+    )).scalar():
         return Response(status=200)
 
     message = Message(
