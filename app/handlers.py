@@ -1,5 +1,7 @@
 import json
 
+from sqlalchemy.sql import exists
+
 from flask import Response
 from slack import WebClient
 
@@ -23,6 +25,15 @@ def handle_message(event):
     # subtype messages are not supported
     if 'subtype' in event:
         return Response(status=204)
+
+    query = db.session.query(Message).filter(
+        Message.user == event['user'],
+        Message.channel == event['channel'],
+        Message.timestamp == event['ts'],
+    )
+    if db.session.query(query.exists()).scalar():
+        return Response(status=200)
+
     message = Message(
         user=event['user'],
         channel=event['channel'],
