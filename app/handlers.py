@@ -29,7 +29,7 @@ def handle_message(event):
     query = db.session.query(Message).filter(
         Message.user == event['user'],
         Message.channel == event['channel'],
-        Message.timestamp == event['ts'],
+        Message.ts == event['ts'],
     )
     if db.session.query(query.exists()).scalar():
         return Response(status=200)
