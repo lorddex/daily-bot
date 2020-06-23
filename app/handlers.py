@@ -1,5 +1,6 @@
 import json
 
+from sqlalchemy import and_
 from sqlalchemy.sql import exists
 
 from flask import Response
@@ -26,11 +27,11 @@ def handle_message(event):
     if 'subtype' in event:
         return Response(status=204)
 
-    if db.session.query(exists().where(
+    if db.session.query(exists().where(and_(
         Message.user == event['user'],
         Message.channel == event['channel'],
         Message.ts == event['ts'],
-    )).scalar():
+    ))).scalar():
         return Response(status=200)
 
     message = Message(
