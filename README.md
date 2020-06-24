@@ -18,8 +18,8 @@ You can clean all your messages using a slash command linked to the `/clean-all`
 ## Configuration
 
 Configure two commands:
-* /daily-report: Get a daily report. It must be linked to the `/report` endpoint.
-* /daily-clean-all: Remove all messages stored by the user. It must be linked to the `/clean-all` endpoint.
+* `/daily-report`: Get a daily report. It must be linked to the `/report` endpoint.
+* `/daily-clean-all`: Remove all messages stored by the user. It must be linked to the `/clean-all` endpoint.
 
 ### Bot Token Scopes
 * app_mentions:read
